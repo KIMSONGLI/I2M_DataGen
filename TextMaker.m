@@ -1,18 +1,13 @@
 close all; clear; clc
-% 폰트별로 텍스트 만들기, -10~10deg 회전해서 3개씩
+%<*** 폰트별로 텍스트 만들기 ***>
 
-% 이미지 사이즈 : 56*56 흑백 uint8형식. 배경에 노이즈 0~150 랜덤생성.
-% 텍스트 적당히 생성 후, 리사이즈 해서 만들쟈!, 빈 패딩은 3포인트 만들쟈!
-
-fontList = listfonts;
-noIMG = zeros(256);
-fig1 = figure;
-imaxes = imshow(noIMG);
+fontList = listfonts;                                                      % 컴퓨터에 저장된 폰트 리스트
+noIMG = zeros(256);                                                        % 검정 배경 256*256
+fig1 = figure; imaxes = imshow(noIMG);                                     % 참고) imaxes.CData에 noIMG가 저장됨
 word = text(128,128, '', 'FontSize',55, 'Color',[1,1,1],...
-            'HorizontalAlignment','center', 'Interpreter','tex');
+            'HorizontalAlignment','center', 'Interpreter','tex');          % 업데이트를 위한 빈 텍스트
         % 'String',text_write, 'FontName',font{1}
-nowFolder = cd;
-% imaxes.CData = randi([0 150], 256);
+nowFolder = cd;                                                            % 현재 폴더 경로 저장
 
 folderNames = char([913:937, 945:969]);
 % char([65296:65305,65:90,65345:65370]); % 폴더명 글자 '０１２３４５６７８９ABCDEFGHIJKLMNOPQRSTUVWXYZａｂｃｄｅｆｇｈｉｊｋｌｍｎｏｐｑｒｓｔｕｖｗｘｙｚ'
@@ -25,14 +20,15 @@ figureUseNames = char([913:937, 945:969]);
 
 for iterFolder = 1:length(folderNames)
 
+%%% 폴더 이동
     text_write = folderNames(iterFolder);
-    try
+    try % 일단 폴더 이동 시도
         cd([nowFolder,'\DigitDataset\',text_write]);
-    catch
+    catch % 실패경우, 폴더를 만든 다음에 이동
         mkdir([nowFolder,'\DigitDataset\',text_write]);
         cd([nowFolder,'\DigitDataset\',text_write]);
     end
-    
+%%% 예외 글자 처리
     text_write = figureUseNames(iterFolder);
     switch text_write
         case '^'
@@ -44,7 +40,7 @@ for iterFolder = 1:length(folderNames)
     for font = fontList'
         word.String = ['\fontname{',font{1},'}',text_write];
 %         word.FontName = font{1};
-        for rot = [-10, 0, 10]
+        for rot = linspace(0, 360, 8)
             iter = iter+1;
             set(word,'Rotation',rot);
             img = rgb2gray(frame2im(getframe(gca)));
@@ -66,5 +62,4 @@ for iterFolder = 1:length(folderNames)
 end
 winopen([nowFolder,'\DigitDataset']);
 cd(nowFolder)
-close(fig1)
-% clear fontList noIMG fig1 nowFolder text_write iter font t rot img_write
+close(fig1); clear
